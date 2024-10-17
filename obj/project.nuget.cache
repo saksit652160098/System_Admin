@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "FIi5YFgrHsI=",
+  "dgSpecHash": "bYBJYSFzATs=",
   "success": true,
   "projectFilePath": "/Users/remixx/Documents/Projects/Memcach/Memcach/Memcach.csproj",
   "expectedPackageFiles": [
     "/Users/remixx/.nuget/packages/azure.core/1.35.0/azure.core.1.35.0.nupkg.sha512",
     "/Users/remixx/.nuget/packages/azure.identity/1.10.3/azure.identity.1.10.3.nupkg.sha512",
+    "/Users/remixx/.nuget/packages/enyimmemcached/2.16.0/enyimmemcached.2.16.0.nupkg.sha512",
     "/Users/remixx/.nuget/packages/humanizer/2.14.1/humanizer.2.14.1.nupkg.sha512",
     "/Users/remixx/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/remixx/.nuget/packages/humanizer.core.af/2.14.1/humanizer.core.af.2.14.1.nupkg.sha512",
@@ -231,6 +232,16 @@
       "warningLevel": 1,
       "message": "Package 'System.Text.Json' 7.0.3 has a known high severity vulnerability, https://github.com/advisories/GHSA-hh2w-p6rv-4g7w",
       "libraryId": "System.Text.Json",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'EnyimMemcached 2.16.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
+      "libraryId": "EnyimMemcached",
       "targetGraphs": [
         "net8.0"
       ]

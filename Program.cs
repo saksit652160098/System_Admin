@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Memcach.Data;
@@ -28,4 +29,3 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 app.Run();
-

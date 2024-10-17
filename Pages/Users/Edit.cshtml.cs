@@ -1,21 +1,20 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Memcach.Data;
 using Memcach.Model;
+using System.Diagnostics; // เพิ่มการนำเข้าคลาส Stopwatch
 
 namespace Memcach.Pages.Users
 {
     public class EditModel : PageModel
     {
-        private readonly Memcach.Data.MemcachContext _context;
+        private readonly MemcachContext _context;
 
-        public EditModel(Memcach.Data.MemcachContext context)
+        public EditModel(MemcachContext context)
         {
             _context = context;
         }
@@ -30,7 +29,7 @@ namespace Memcach.Pages.Users
                 return NotFound();
             }
 
-            var user =  await _context.User.FirstOrDefaultAsync(m => m.ID == id);
+            var user = await _context.User.FirstOrDefaultAsync(m => m.ID == id);
             if (user == null)
             {
                 return NotFound();
@@ -39,8 +38,6 @@ namespace Memcach.Pages.Users
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -49,6 +46,10 @@ namespace Memcach.Pages.Users
             }
 
             _context.Attach(User).State = EntityState.Modified;
+
+            // สร้าง Stopwatch เพื่อจับเวลา
+            var stopwatch = new Stopwatch();
+            stopwatch.Start(); // เริ่มจับเวลา
 
             try
             {
@@ -65,6 +66,13 @@ namespace Memcach.Pages.Users
                     throw;
                 }
             }
+
+            // หยุดจับเวลาเมื่อแก้ไขเสร็จ
+            stopwatch.Stop();
+            User.TimeTaken = (decimal)stopwatch.Elapsed.TotalMilliseconds;
+
+            // บันทึกเวลาที่ใช้ในการแก้ไขข้อมูล
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
         }

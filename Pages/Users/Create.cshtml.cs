@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Memcach.Model;
 using Memcach.Data;
@@ -41,7 +42,7 @@ namespace Memcach.Pages.Users
 
             // จำลองความล่าช้า (delay) 10 วินาที
 
-        
+
             // บันทึกผู้ใช้ใหม่ลงในฐานข้อมูล
             _context.User.Add(User);
             await _context.SaveChangesAsync(); // บันทึกข้อมูลแรก

@@ -8,6 +8,6 @@ namespace Memcach.Model
         public string LastName { get; set; }
         public string Email { get; set; }
         public DateTime CreatedAt { get; set; }
-        public decimal TimeTaken { get; set; }
+        public decimal TimeTaken { get; set; } // เวลาที่ใช้ในการบันทึกลงฐานข้อมูล
     }
 }
