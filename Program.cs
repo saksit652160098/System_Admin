@@ -5,6 +5,7 @@ using Memcach.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddMemoryCache();
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<MemcachContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("MemcachContext") ?? throw new InvalidOperationException("Connection string 'MemcachContext' not found.")));
@@ -18,6 +19,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
