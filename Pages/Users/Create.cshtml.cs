@@ -40,7 +40,7 @@ namespace Memcach.Pages.Users
             stopwatch.Start(); // เริ่มจับเวลา
 
             // ลองดึงข้อมูลจากแคชก่อน
-            if (_memoryCache.TryGetValue(User.UserId.ToString(), out User cachedUser))
+            if (_memoryCache.TryGetValue(User.ID.ToString(), out User cachedUser))
             {
                 // หากมีข้อมูลในแคช ให้ใช้ข้อมูลจากแคชโดยไม่ต้องบันทึกลงฐานข้อมูลอีกครั้ง
                 User = cachedUser;
@@ -67,8 +67,7 @@ namespace Memcach.Pages.Users
             _context.User.Update(User);
             await _context.SaveChangesAsync();
 
-            // เพิ่มผู้ใช้ลงในแคช Memory Cache
-            _memoryCache.Set(User.UserId.ToString(), User, new MemoryCacheEntryOptions()
+            _memoryCache.Set(User.ID.ToString(), User, new MemoryCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7), // ข้อมูลจะถูกเก็บสูงสุด 7 วัน
                 SlidingExpiration = TimeSpan.FromHours(1) // รีเฟรชทุก 1 ชั่วโมงหากมีการเข้าถึงข้อมูล
