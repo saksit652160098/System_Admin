@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Memcach.Migrations
 {
     [DbContext(typeof(MemcachContext))]
-    [Migration("20241016042350_InitialCreateMemcachmi")]
-    partial class InitialCreateMemcachmi
+    [Migration("20241023110819_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,9 +25,6 @@ namespace Memcach.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("CacheTimeTaken")
-                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
@@ -42,9 +39,6 @@ namespace Memcach.Migrations
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("TimeTaken")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");

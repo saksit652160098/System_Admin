@@ -23,9 +23,6 @@ namespace Memcach.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("CacheTimeTaken")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
@@ -39,9 +36,6 @@ namespace Memcach.Migrations
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("TimeTaken")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");

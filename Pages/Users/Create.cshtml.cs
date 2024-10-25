@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Memcach.Model;
 using Memcach.Data;
-using Microsoft.Extensions.Caching.Memory; // นำเข้าการใช้ Memory Cache
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Internal;
+using Microsoft.EntityFrameworkCore;
 
 namespace Memcach.Pages.Users
 {
@@ -26,56 +26,75 @@ namespace Memcach.Pages.Users
 
         public void OnGet()
         {
-            // คำสั่งนี้จะทำเมื่อมีการเรียกหน้า Create.cshtml
+            // เรียกหน้า Create.cshtml
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            var stopwatch = Stopwatch.StartNew(); // เริ่มจับเวลา
+
+            // ตรวจสอบความถูกต้องของข้อมูล
             if (!ModelState.IsValid)
             {
+                Console.WriteLine($"[VALIDATION TIME] Time taken: {stopwatch.Elapsed.TotalMilliseconds} ms");
                 return Page();
             }
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start(); // เริ่มจับเวลา
-
-            // ลองดึงข้อมูลจากแคชก่อน
-            if (_memoryCache.TryGetValue(User.ID.ToString(), out User cachedUser))
+            if (User == null)
             {
-                // หากมีข้อมูลในแคช ให้ใช้ข้อมูลจากแคชโดยไม่ต้องบันทึกลงฐานข้อมูลอีกครั้ง
+                ModelState.AddModelError(string.Empty, "User data is missing.");
+                Console.WriteLine($"[USER CHECK TIME] Time taken: {stopwatch.Elapsed.TotalMilliseconds} ms");
+                return Page();
+            }
+
+            // ตรวจสอบว่ามีผู้ใช้ที่มีชื่อซ้ำอยู่หรือไม่
+            var existingUser = await _context.User
+                .FirstOrDefaultAsync(u => u.FirstName == User.FirstName &&
+                                           u.LastName == User.LastName &&
+                                           u.Email == User.Email);
+
+            if (existingUser != null)
+            {
+                ModelState.AddModelError(string.Empty, "A user with the same name and email already exists.");
+                Console.WriteLine($"[DUPLICATE CHECK TIME] Time taken: {stopwatch.Elapsed.TotalMilliseconds} ms");
+                return Page();
+            }
+
+            string cacheKey = $"User:{User.Email}"; // ใช้ Email เป็น Key เพื่อหลีกเลี่ยงการซ้ำซ้อนใน Cache
+
+            // ตรวจสอบ Cache
+            bool cacheHit = _memoryCache.TryGetValue(cacheKey, out User cachedUser);
+            if (cacheHit)
+            {
                 User = cachedUser;
-
-                stopwatch.Stop(); // หยุดจับเวลา
-                Console.WriteLine($"Time taken to retrieve from cache: {stopwatch.Elapsed.TotalMilliseconds} ms");
-
+                Console.WriteLine($"[CACHE HIT] Time taken to retrieve from cache: {stopwatch.Elapsed.TotalMilliseconds} ms");
                 return RedirectToPage("./Index");
             }
 
-            // หากไม่มีข้อมูลในแคช ให้บันทึกข้อมูลใหม่
-            stopwatch.Restart(); // เริ่มจับเวลาใหม่สำหรับการบันทึกข้อมูล
-
-            User.CreatedAt = DateTime.Now;
-
-            // บันทึกผู้ใช้ใหม่ลงในฐานข้อมูล
-            _context.User.Add(User);
-            await _context.SaveChangesAsync();
-
-            stopwatch.Stop(); // หยุดจับเวลา
-            User.TimeTaken = (decimal)stopwatch.Elapsed.TotalMilliseconds;
-
-            // อัปเดต TimeTaken ในฐานข้อมูล
-            _context.User.Update(User);
-            await _context.SaveChangesAsync();
-
-            _memoryCache.Set(User.ID.ToString(), User, new MemoryCacheEntryOptions()
+            try
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7), // ข้อมูลจะถูกเก็บสูงสุด 7 วัน
-                SlidingExpiration = TimeSpan.FromHours(1) // รีเฟรชทุก 1 ชั่วโมงหากมีการเข้าถึงข้อมูล
-            });
+                // บันทึกข้อมูลลงฐานข้อมูล
+                User.CreatedAt = DateTime.Now;
+                _context.User.Add(User);
+                await _context.SaveChangesAsync();
 
-            Console.WriteLine($"Time taken to save to database: {User.TimeTaken} ms");
+                // บันทึกข้อมูลลง Cache
+                _memoryCache.Set(cacheKey, User, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7),
+                    SlidingExpiration = TimeSpan.FromHours(1)
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred while saving user: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "An error occurred while saving data.");
+                return Page();
+            }
 
+            stopwatch.Stop();
+            Console.WriteLine($"[TOTAL TIME] Total time taken for Create: {stopwatch.Elapsed.TotalMilliseconds} ms");
             return RedirectToPage("./Index");
+        }
     }
-}
 }
